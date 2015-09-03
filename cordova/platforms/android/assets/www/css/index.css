@@ -1,0 +1,30 @@
+/*body {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  color: #888888;
+  font-size: 11px;
+}
+
+td {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  color: #888888;
+  font-size: 11px;
+}
+
+.cbutton {
+  font-size: 18px;
+  color:#999999;
+  background-color:#000000;
+  border-style:inset;
+  border-color:#BBBBBB;
+  border-width:1px;
+}*/
+
+.cbutton {
+  width: 90%;
+  height: 100px;
+}
+
+#location {
+  width: 100%;
+  height: 200px;
+}

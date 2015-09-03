@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' http://gps.heikin.tk data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+  <title>Live GpsLogger</title>
+  <link href="css/index.css" rel="stylesheet" />
+  <script type="text/javascript" src="cordova.js"></script>
+  <script src="js/jquery-2.1.4.min.js" type="text/javascript"></script>
+  <script src="js/index.js" type="text/javascript">
+    alert("Test!");
+  </script>
+
+</head>
+<body>
+
+  <h1 class="title">Live GpsLogger</h1>
+
+  <div id="console" style="width:90%; height: 150px; display: none"></div>
+
+  <div id="location">Press Start GPS button to start tracking. You can save route to GPX with start logging -button.</div>
+  <br /><br />
+  <button id="startgps" class="cbutton">Start GPS</button><br><br>
+  <button id="startlogger" class="cbutton">Start Logging</button>
+  <br><br>
+  <button id="getgpx" class="cbutton">Download log as GPX</button>
+  <div id="info"></div>
+
+  <form name="togpx" action="http://gps.heikin.tk/logger/downloadgpx.php" method="POST">
+    <input name="gpxdata" id="gpxdata" value="" type="hidden">
+    <input name="gpxfilename" id="gpxfilename" value="" type="hidden">
+  </form>
+
+
+
+</body>
+</html>

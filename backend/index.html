@@ -1,0 +1,217 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"><head>
+  <meta name="viewport" content="width=device-width; height=device-height; initial-scale=1.0; maximum-scale=3.0;">
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+
+  <title>HTML5 GPS Logger</title>
+
+  <style>
+  body{font-family: Verdana, Arial, Helvetica, sans-serif; color: #888888; font-size: 11px; }
+  td{font-family: Verdana, Arial, Helvetica, sans-serif; color: #888888; font-size: 11px; }
+  .cbutton {  font-size: 18px;  color:#999999;    background-color:#000000;    border-style:inset;    border-color:#BBBBBB;   border-width:1px; }
+
+  </style>
+
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js" type="text/javascript"></script>
+
+</head>
+<body bgcolor="000000">
+
+  <h3>GPS Logger</h3>
+
+  <div id="console" style="width:90%; height: 150px; display: none"></div>
+
+  <div style="float:left;width:190px;" id="location">Waiting...</div>
+  <div style="clear:both;height:5px"></div>
+  <br><br>
+  <button onclick="javascript:startgps();" id="startgps" class="cbutton">Start GPS</button><br><br>
+  <button onclick="javascript:startstop();" id="start" class="cbutton">Start Logging</button>
+  <br><br>
+  <button onclick="alert('Not implemented!')" id="posttoserver" class="cbutton">Post data to server</button>
+  <br><br>
+  <button onclick="makegpx();" id="getgpx" class="cbutton">Download log as GPX</button>
+  <div id="info"></div>
+
+  <form name="togpx" action="backend.php" method="POST">
+    <input name="gpxdata" id="gpxdata" value="" type="hidden">
+    <input name="gpxfilename" id="gpxfilename" value="" type="hidden">
+  </form>
+
+  <script type="text/javascript">
+  // <!--
+  var track=new Array();
+  var GPX=new Array();
+  var tme=0;
+  var locationdiv;
+  var gpxname='';
+  var playing=0;
+  var started=0;
+  var infodiv;
+  var ptimepre=0;
+  var distance =0;
+  var resolution=1; // seconds between samples.
+  var accuracy=-1;
+  var skip =0;
+  var lat;
+  var lng;
+  var timestamp=0;
+
+  var watchid=0;
+  var tunnus = "test";
+
+
+  function startstop()
+  {
+    ptimepre=0;
+    if (!playing)
+    { playing=1;
+      var startbutton = document.getElementById('start');
+      startbutton.innerHTML='Stop logging';
+
+    }
+    else
+    { playing=0;
+      var startbutton = document.getElementById('start');
+      startbutton.innerHTML='Start logging';
+
+    }
+  }
+
+  function startgps()
+  {
+    locationdiv = document.getElementById('location');
+    locationdiv.innerHTML="Trying...";
+    if (!started)
+    {
+      if(navigator.geolocation)
+      {
+        watchid = navigator.geolocation.watchPosition(foundLocation,noLocation,{enableHighAccuracy:true, timeout:2000, maximumAge: 1000});
+        started=1;
+        //positionRequestor();
+      }
+      else
+      { locationdiv.innerHTML="Not supported";
+      alert("It seems like your device/browser does not support geolocation!");
+    }
+  } else {
+    alert("Already started!");
+  }
+}
+
+function positionRequestor(){
+  navigator.geolocation.getCurrentPosition(foundLocation,noLocation,{enableHighAccuracy:true, timeout:5000, maximumAge: 1000});
+  setTimeout("positionRequestor()",1000);
+}
+
+function foundLocation(p)
+{
+  //alert(p);
+  var d = new Date();
+  var thisDate = d.getTime();
+  thisDate=Math.floor(thisDate/1000);
+
+  lat = p.coords.latitude;
+  lng = p.coords.longitude;
+  accuracy =p.coords.accuracy;
+  ptime=thisDate;
+  timestamp = p.timestamp;
+  //  ptime=Math.floor(new Date(timestamp).getTime()/1000);
+  //if(ptime < 123878630)ptime=Math.floor(new Date(timestamp).getTime())
+
+  //alert("Sending to server");
+
+  // send to server
+  $.ajax({
+    url: 'save.php',
+    data: {
+      lat: lat,
+      lon: lng,
+      acc: accuracy,
+      c: tunnus,
+      time: parseInt(timestamp/1000)
+    },
+    success: function(data) {
+      $("#console").append("Called: "+data.toString()+"\n");
+    },
+    error: function(xhr, status, error) {
+      $("#console").append("Error: "+error.toString()+"\n");
+    }
+  });
+
+  locationdiv.innerHTML="<nobr>Lat:"+(Math.floor(lat*10000000)/10000000)+"<br>Lon:"+(Math.floor(lng*10000000)/10000000) +"<br>UTC Time:" +ISODateString(d) + "<br>Accuracy:"+Math.floor(accuracy)+ "<br>Points saved: "+track.length+"<br>Time: "+addzero(Math.floor(tme/60))+":"+addzero(tme-Math.floor(tme/60)*60)+"<br>Distance:"+(Math.floor(distance*100)/100) +" km</nobr>";
+  if(playing && accuracy < 40 && accuracy > 0.01 && ptime -resolution > ptimepre-1){
+    if(ptimepre>0){
+      tme=tme+ptime-ptimepre;
+      distance=1*distance+1*calculateDistance(lat,lng,prelat,prelng);
+    }
+    if(gpxname ==''){gpxname='log_'+ISODateString(d)+'_gpx.txt';}
+    track[track.length]=''+ptime+','+ISODateString(d)+','+Math.floor(lat*10000000)/10000000+','+Math.floor(lng*10000000)/10000000+","+Math.floor(distance*1000);
+
+    GPX[GPX.length]='<trkpt lat="'+Math.floor(lat*10000000)/10000000+'" lon="'+Math.floor(lng*10000000)/10000000+'"><time>'+ISODateString(d)+'</time></trkpt>\n';
+
+    prelat=lat;
+    prelng=lng;
+    ptimepre=ptime;
+  }
+
+}
+
+
+function makegpx()
+{
+  var oFormObject = document.forms['togpx'];
+  oFormObject.elements["gpxdata"].value='<?xml version="1.0" encoding="UTF-8" ?><gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="RGGPSLOGGER" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tp1="http://www.garmin.com/xmlschemas/TrackPointExtension/v1" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"><trk><trkseg>' + GPX.join('') + '</trkseg></trk></gpx>';
+  oFormObject.elements["gpxfilename"].value=gpxname;
+  oFormObject.submit();
+
+}
+
+
+function noLocation(p)
+{
+
+  alert('Error: ' +p.message);
+}
+
+
+// Reused code - copyright Moveable Type Scripts - retrieved May 4, 2010.
+// http://www.movable-type.co.uk/scripts/latlong.html
+// Under Creative Commons License http://creativecommons.org/licenses/by/3.0/
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  var R = 6371; // km
+  var dLat = (lat2-lat1).toRad();
+  var dLon = (lon2-lon1).toRad();
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+  Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) *
+  Math.sin(dLon/2) * Math.sin(dLon/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  var d = R * c;
+  return d;
+}
+Number.prototype.toRad = function() {
+  return this * Math.PI / 180;
+}
+
+function ISODateString(d){
+  function pad(n){return n<10 ? '0'+n : n}
+  return d.getUTCFullYear()+'-'
+  + pad(d.getUTCMonth()+1)+'-'
+  + pad(d.getUTCDate())+'T'
+  + pad(d.getUTCHours())+':'
+  + pad(d.getUTCMinutes())+':'
+  + pad(d.getUTCSeconds())+'Z'}
+
+  function addzero(n) {
+    return (n < 10) ? ("0" + n) : n;
+  }
+
+  //-->
+
+
+  </script>
+
+
+
+</body></html>
