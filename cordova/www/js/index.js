@@ -35,7 +35,7 @@ var app = {
   onDeviceReady: function() {
     $(function() {
       //console.log(cordova);
-      cordova.plugins.backgroundMode.configure({
+      cordova.plugins.backgroundMode.setDefaults({
         title: "Live GpsLogger taustalla",
       });
       run();
