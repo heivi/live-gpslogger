@@ -4,8 +4,6 @@ local.properties
 /gradlew
 /gradlew.bat
 /gradle
-.gradle/
-.gradle/**
 # Ant builds
 ant-build
 ant-gen

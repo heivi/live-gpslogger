@@ -33,6 +33,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.PowerManager;
 
 public class BackgroundMode extends CordovaPlugin {
 
@@ -58,6 +59,9 @@ public class BackgroundMode extends CordovaPlugin {
 
     // Tmp config settings for the notification
     private static JSONObject updateSettings;
+
+    private PowerManager pm = null;
+    private PowerManager.WakeLock wl = null;
 
     // Used to (un)bind the service to with the activity
     private final ServiceConnection connection = new ServiceConnection() {
@@ -105,11 +109,28 @@ public class BackgroundMode extends CordovaPlugin {
         }
 
         if (action.equalsIgnoreCase("enable")) {
+
+            Context context = cordova.getActivity().getApplicationContext();
+
+            pm = (PowerManager) context.getSystemService(context.POWER_SERVICE);
+            wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BackgroundMode");
+
+
+            // get partial wake lock
+            wl.acquire();
+
             enableMode();
             return true;
         }
 
         if (action.equalsIgnoreCase("disable")) {
+
+            // release partial wake lock
+            wl.release();
+
+            pm = null;
+            wl = null;
+
             disableMode();
             return true;
         }
@@ -241,6 +262,7 @@ public class BackgroundMode extends CordovaPlugin {
             fireEvent(Event.ACTIVATE, null);
 
             context.startService(intent);
+
         } catch (Exception e) {
             fireEvent(Event.FAILURE, e.getMessage());
         }

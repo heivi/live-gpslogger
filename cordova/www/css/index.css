@@ -22,6 +22,9 @@ td {
 .cbutton {
   width: 90%;
   height: 100px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #location {

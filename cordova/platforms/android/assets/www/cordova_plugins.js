@@ -24,9 +24,9 @@ module.exports = [
 module.exports.metadata = 
 // TOP OF METADATA
 {
+    "cordova-plugin-geolocation": "1.0.1",
     "cordova-plugin-whitelist": "1.0.0",
     "de.appplant.cordova.plugin.background-mode": "0.6.4",
-    "cordova-plugin-geolocation": "1.0.1",
     "org.apache.cordova.device": "0.3.0"
 }
 // BOTTOM OF METADATA
