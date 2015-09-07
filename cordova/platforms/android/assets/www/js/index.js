@@ -35,7 +35,7 @@ var app = {
   onDeviceReady: function() {
     $(function() {
       //console.log(cordova);
-      cordova.plugins.backgroundMode.configure({
+      cordova.plugins.backgroundMode.setDefaults({
         title: "Live GpsLogger taustalla",
       });
       run();
@@ -62,7 +62,8 @@ var lng;
 var timestamp=0;
 
 var watchid=0;
-var tunnus = "test";
+var tunnus = "none";
+var name = "none";
 
 app.initialize();
 
@@ -234,6 +235,14 @@ function startgps() {
     function run() {
 
       //alert("run()");
+
+      $("#id").change(function() {
+        tunnus = $(this).val();
+      });
+
+      $("#name").change(function() {
+        name = $(this).val();
+      });
 
       $("#startgps").click(function() {
         startgps();
