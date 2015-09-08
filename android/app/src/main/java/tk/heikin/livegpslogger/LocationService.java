@@ -1,9 +1,17 @@
 package tk.heikin.livegpslogger;
 
+import android.annotation.TargetApi;
+import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 
 import java.io.OutputStreamWriter;
@@ -11,28 +19,30 @@ import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import fr.quentinklein.slt.LocationTracker;
-import fr.quentinklein.slt.TrackerSettings;
-
 public class LocationService extends Service {
 
     public static final String LocationServiceName = "tk.heikin.livegpslogger.LocationService";
 
+    private String trackingId = "none";
+
     private String TAG = "LocationService";
+
+    private int notifyId = 65432356;
 
     private Location last = null;
 
-    TrackerSettings settings =
-            new TrackerSettings()
-                    .setUseGPS(true)
-                    .setUseNetwork(true)
-                    .setUsePassive(true)
-                    .setTimeBetweenUpdates(1000)
-                    .setMetersBetweenUpdates(1);
+    private LocationManager locationManager = null;
+    private LocationListener locationListener = null;
 
-    LocationTracker locationTracker;
+    private PowerManager pm = null;
+    private PowerManager.WakeLock wl = null;
 
     public LocationService() {
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
     }
 
     @Override
@@ -42,75 +52,42 @@ public class LocationService extends Service {
     }
 
     @Override
+    @TargetApi(16)
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Log.d(TAG, "Started Service");
+        Notification noti;
 
-        final String trackingId = intent.getStringExtra("trackingId");
+        int sdk = Build.VERSION.SDK_INT;
+
+        if (sdk <= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+            noti = new Notification.Builder(this.getApplicationContext())
+                    .setContentTitle("Location tracking on background")
+                    .getNotification();
+        } else {
+            noti = new Notification.Builder(this.getApplicationContext())
+                    .setContentTitle("Location tracking on background")
+                    .build();
+        }
+
+        this.startForeground(notifyId, noti);
+
+        pm = (PowerManager) this.getApplicationContext().getSystemService(Context.POWER_SERVICE);
+
+        wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Location tracking");
+        wl.acquire();
+
+        Log.d(TAG, "Wake lock acquired");
+
+        trackingId = intent.getStringExtra("trackingId");
         Log.d(TAG, intent.getExtras().toString());
 
-        locationTracker = new LocationTracker(this.getApplicationContext(), settings) {
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new MyLocationListener(trackingId, this.getApplicationContext());
 
-            @Override
-            public void onLocationFound(final Location location) {
-                // Do some stuff when a new location has been found.
-
-                new Thread( new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-
-                            if (location.equals(last)) {
-                                return;
-                            }
-
-                            last = location;
-
-                            String query = "lat="+location.getLatitude()+"&lon="+location
-                                    .getLongitude()+"&acc="+location.getAccuracy()
-                                    +"&c="+trackingId+"&time="+location.getTime();
-
-                            URL url = new URL("http://gps.heikin.tk/logger/save.php?"+query);
-                            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                            //connection.setRequestProperty("Cookie", cookie);
-                            Log.d(TAG, connection.toString());
-                            //Set to POST
-                            connection.setDoOutput(true);
-                            connection.setRequestMethod("POST");
-                            connection.setReadTimeout(10000);
-                            /*Writer writer = new OutputStreamWriter(connection.getOutputStream());
-                            writer.write(query);
-                            writer.flush();
-                            writer.close();*/
-
-                            //Log.d(TAG, connection.getResponseMessage());
-
-                            if (connection.getResponseMessage().equals("OK")) {
-                                Log.d(TAG, "Sent POST");
-                            } else {
-                                Log.e(TAG, "Error sending!");
-                            }
-
-                            connection.disconnect();
-
-                            //Log.d(TAG, "Sent POST");
-
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            Log.e(TAG, e.toString());
-                        }
-                    }
-                }).start();
-
-            }
-
-            @Override
-            public void onTimeout() {
-                Log.e(TAG, "Timed out!");
-            }
-        };
-
-        locationTracker.startListen();
+        // This method is used to get updated location.
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
         return START_STICKY;
     }
@@ -119,6 +96,16 @@ public class LocationService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        locationTracker.stopListen();
+        Log.d(TAG, "Destroying service!");
+        this.stopForeground(true);
+
+        locationManager.removeUpdates(locationListener);
+
+        if (wl != null) {
+            wl.release();
+            wl = null;
+            Log.d(TAG, "Wake lock released");
+        }
+
     }
 }

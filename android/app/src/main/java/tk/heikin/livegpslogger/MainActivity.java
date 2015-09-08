@@ -3,6 +3,7 @@ package tk.heikin.livegpslogger;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationService locationService;
     private Intent serviceIntent;
+    private String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +23,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final Button button = (Button) findViewById(R.id.button);
+        final Button button2 = (Button) findViewById(R.id.button2);
+
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                button.setClickable(false);
+                button2.setClickable(true);
+
                 // Perform action on click
                 //startService(new Intent();
                 serviceIntent = new Intent(v.getContext().getApplicationContext(), LocationService.class);
@@ -35,9 +43,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final Button button2 = (Button) findViewById(R.id.button2);
         button2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                button.setClickable(true);
+                button2.setClickable(false);
                 // Perform action on click
                 if (serviceIntent != null) {
                     stopService(serviceIntent);
@@ -69,5 +78,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "Activity paused!");
     }
 }

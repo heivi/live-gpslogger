@@ -1,15 +1,8 @@
-repositories {
-    maven {
-        url "https://jitpack.io"
-    }
-}
-
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
-
     defaultConfig {
         applicationId "tk.heikin.livegpslogger"
         minSdkVersion 15
@@ -23,10 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.github.quentin7b:android-location-tracker:3.0'
 }
