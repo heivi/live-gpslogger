@@ -39,6 +39,25 @@ var app = {
         title: "Live GpsLogger taustalla",
       });
       run();
+
+      cordova.plugins.backgroundMode.enable();
+
+      function stillAlive() {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          console.log("Position got");
+        }, function(err) {
+          console.log("Error getting pos: "+err.message);
+        }, {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        });
+        console.log("Still Alive");
+        setTimeout(stillAlive, 5000);
+      }
+
+      stillAlive();
+
     });
 
   }
@@ -87,13 +106,13 @@ function startgps() {
     started = 1;
     if(navigator.geolocation) {
 
-      watchid = navigator.geolocation.watchPosition(
+      /*watchid = navigator.geolocation.watchPosition(
         foundLocation,
         noLocation, {
           enableHighAccuracy:true,
           timeout:5000,
           maximumAge: 5000
-        });
+        });*/
       } else {
         $("#location").html("Not supported!");
       }
@@ -117,6 +136,8 @@ function startgps() {
     //if(ptime < 123878630)ptime=Math.floor(new Date(timestamp).getTime())
 
     //alert("Sending to server");
+
+    console.log("Sending location");
 
     // send to server
     $.ajax({

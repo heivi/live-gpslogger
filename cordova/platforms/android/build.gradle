@@ -171,6 +171,10 @@ android {
         }
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
     defaultConfig {
         versionCode cdvVersionCode ?: Integer.parseInt("" + privateHelpers.extractIntFromManifest("versionCode") + "0")
         if (cdvMinSdkVersion != null) {
