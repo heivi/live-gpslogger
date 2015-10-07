@@ -1,0 +1,60 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "Properties/WMAppManifest.xml": {
+                "parents": {
+                    "/Deployment/App/Capabilities": [
+                        {
+                            "xml": "<Capability Name=\"ID_CAP_LOCATION\" />",
+                            "count": 2
+                        },
+                        {
+                            "xml": "<Capability Name=\"ID_CAP_IDENTITY_DEVICE\" />",
+                            "count": 1
+                        }
+                    ],
+                    "/Deployment/App/Tasks/DefaultTask": [
+                        {
+                            "xml": "<BackgroundExecution><ExecutionType Name=\"LocationTracking\" /></BackgroundExecution>",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"Device\"><param name=\"wp-package\" value=\"Device\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"BackgroundMode\"><param name=\"wp-package\" value=\"BackgroundMode\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "{76a5b620-6cff-11e5-a2a5-0981374c44c4}"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "{76a5b620-6cff-11e5-a2a5-0981374c44c4}"
+        },
+        "de.appplant.cordova.plugin.background-mode": {
+            "PACKAGE_NAME": "{76a5b620-6cff-11e5-a2a5-0981374c44c4}"
+        }
+    },
+    "dependent_plugins": {
+        "org.apache.cordova.device": {
+            "PACKAGE_NAME": "{76a5b620-6cff-11e5-a2a5-0981374c44c4}"
+        }
+    }
+}

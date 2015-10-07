@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="tk.heikin.gps.logger" version="1.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="Device">
+        <param name="wp-package" value="Device" />
+    </feature>
+    <feature name="BackgroundMode">
+        <param name="wp-package" value="BackgroundMode" />
+    </feature>
+    <name>Live GpsLogger</name>
+    <description>
+    Mobile logger for live gps
+  </description>
+    <author email="heikki@virekunnas.fi" href="http://heikki.virekunnas.fi">
+    Heikki Virekunnas
+  </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+</widget>
