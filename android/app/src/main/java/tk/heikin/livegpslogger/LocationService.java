@@ -86,8 +86,10 @@ public class LocationService extends Service {
         locationListener = new MyLocationListener(trackingId, this.getApplicationContext());
 
         // This method is used to get updated location.
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0,
+                locationListener);
+        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
+        //        locationListener);
 
         return START_STICKY;
     }

@@ -39,15 +39,23 @@ public class MyLocationListener implements LocationListener {
             public void run() {
                 try {
 
-                    if (last != null && location.getTime() == last.getTime()) {
+                    if (last != null && location.getTime() <= (last.getTime()+1000)) {
+                        Log.d(TAG, "Old timestamp: "+last.getTime()+", new: "+location.getTime());
                         return;
+                    } else if (last != null) {
+                        Log.d(TAG, "Old: "+last.getTime()+", new: "+location.getTime());
+                    } else {
+                        Log.d(TAG, "Last null");
                     }
 
                     last = location;
 
+                    // send time in seconds instead of milliseconds
                     String query = "lat="+location.getLatitude()+"&lon="+location
                             .getLongitude()+"&acc="+location.getAccuracy()
-                            +"&c="+trackingId+"&time="+location.getTime();
+                            +"&c="+trackingId+"&time="+(location.getTime()/1000);
+
+                    Log.v(TAG, "Query: "+query);
 
                     URL url = new URL("http://gps.heikin.tk/logger/save.php?"+query);
                     HttpURLConnection connection = (HttpURLConnection)url.openConnection();
@@ -96,7 +104,7 @@ public class MyLocationListener implements LocationListener {
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
-        Log.d(TAG, "Status changed");
+        Log.d(TAG, "Status changed: "+status);
     }
 
 }

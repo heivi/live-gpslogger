@@ -79,7 +79,7 @@ function startgps() {
 
   function foundLocation(p) {
     //alert(p);
-    var d = new Date();
+    var d = new Date(p.timestamp);
     var thisDate = d.getTime();
     thisDate=Math.floor(thisDate/1000);
 
@@ -88,6 +88,7 @@ function startgps() {
     accuracy =p.coords.accuracy;
     ptime=thisDate;
     timestamp = p.timestamp;
+    console.log(thisDate);
     //  ptime=Math.floor(new Date(timestamp).getTime()/1000);
     //if(ptime < 123878630)ptime=Math.floor(new Date(timestamp).getTime())
 
@@ -101,7 +102,7 @@ function startgps() {
         lon: lng,
         acc: accuracy,
         c: tunnus,
-        time: parseInt(timestamp/1000)
+        time: parseInt(thisDate)
       },
       success: function(data) {
         $("#console").append("Called: "+data.toString()+"\n");
