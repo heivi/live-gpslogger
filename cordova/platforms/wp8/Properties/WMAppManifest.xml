@@ -22,18 +22,23 @@
     <Tokens>
       <PrimaryToken TaskName="_default" TokenID="Live GpsLoggerToken">
         <TemplateFlip>
-          <SmallImageURI IsRelative="true" IsResource="false">Background.png</SmallImageURI>
+          <SmallImageURI IsRelative="true" IsResource="false">Assets\SquareTile71x71.png</SmallImageURI>
           <Count>0</Count>
-          <BackgroundImageURI IsRelative="true" IsResource="false">Background.png</BackgroundImageURI>
+          <BackgroundImageURI IsRelative="true" IsResource="false">Assets\SquareTile150x150.png</BackgroundImageURI>
           <Title>KeparDI GPS</Title>
-          <BackContent />
-          <BackBackgroundImageURI />
-          <BackTitle />
-          <LargeBackgroundImageURI />
+          <BackContent>
+          </BackContent>
+          <BackBackgroundImageURI IsRelative="true" IsResource="false">
+          </BackBackgroundImageURI>
+          <BackTitle>
+          </BackTitle>
+          <LargeBackgroundImageURI IsRelative="true" IsResource="false">Assets\WideLogo.png</LargeBackgroundImageURI>
           <LargeBackContent />
-          <LargeBackBackgroundImageURI />
-          <DeviceLockImageURI />
-          <HasLarge>false</HasLarge>
+          <LargeBackBackgroundImageURI IsRelative="true" IsResource="false">
+          </LargeBackBackgroundImageURI>
+          <DeviceLockImageURI IsRelative="true" IsResource="false">
+          </DeviceLockImageURI>
+          <HasLarge>True</HasLarge>
         </TemplateFlip>
       </PrimaryToken>
     </Tokens>
