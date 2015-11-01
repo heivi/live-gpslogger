@@ -44,22 +44,16 @@ var app = {
     }
 };
 
-var track = new Array();
-var GPX = new Array();
-var tme = 0;
-var locationdiv;
-var gpxname = '';
+//var track = new Array();
+//var GPX = new Array();
+//var tme = 0;
+//var gpxname = '';
 var playing = 0;
 var started = 0;
-var infodiv;
-var ptimepre = 0;
-var distance = 0;
-var resolution = 1; // seconds between samples.
-var accuracy = -1;
-var skip = 0;
-var lat;
-var lng;
-var timestamp = 0;
+//var ptimepre = 0;
+//var distance = 0;
+//var resolution = 1; // seconds between samples.
+
 var points = 0;
 var lastok = false;
 
@@ -71,6 +65,7 @@ var server = "http://gps.virekunnas.fi";
 
 app.initialize();
 
+/*
 function startlogger() {
     ptimepre = 0;
     if (!playing) {
@@ -82,7 +77,7 @@ function startlogger() {
         $("#startlogger").html("Start logging");
         //cordova.plugins.backgroundMode.disable();
     }
-}
+}*/
 
 function startgps() {
     //alert("startgps()");
@@ -102,7 +97,7 @@ function startgps() {
               noLocation, {
                   enableHighAccuracy: true,
                   timeout: 15000,
-                  maximumAge: 30000
+                  maximumAge: 15000
               });
         } else {
             $("#location").html("Not supported!");
@@ -116,10 +111,10 @@ function startgps() {
 function foundLocation(p) {
     //alert(p);
 
-    lat = p.coords.latitude;
-    lng = p.coords.longitude;
-    accuracy = p.coords.accuracy;
-    timestamp = p.timestamp;
+    var lat = p.coords.latitude;
+    var lng = p.coords.longitude;
+    var accuracy = p.coords.accuracy;
+    var timestamp = p.timestamp;
 
     timestamp = parseInt(timestamp / 1000);
 
@@ -135,8 +130,12 @@ function foundLocation(p) {
         time: parseInt(timestamp)
     };
 
+    // to be sent
+    buffer.push(posData);
+    $("#buffer").html(buffer.length);
+
     // send to server
-    $.ajax({
+    /*$.ajax({
         url: server + '/save.php',
         data: posData,
         success: function (data) {
@@ -162,7 +161,7 @@ function foundLocation(p) {
                 $("#buffer").html(buffer.length);
             }
         }
-    });
+    });*/
 
     /*$("#location").html("<nobr>Lat:"+(Math.floor(lat*10000000)/10000000)+
     "<br>Lon:"+(Math.floor(lng*10000000)/10000000) +"<br>UTC Time:" +
@@ -173,7 +172,7 @@ function foundLocation(p) {
 
     $("#location").html("Tracking on! Points found: " + (points++) + "<br>Accuracy: " + accuracy + " m");
 
-    if (playing && accuracy < 40 && accuracy > 0.01 && ptime - resolution > ptimepre - 1) {
+    /*if (playing && accuracy < 40 && accuracy > 0.01 && ptime - resolution > ptimepre - 1) {
         if (ptimepre > 0) {
             tme = tme + ptime - ptimepre;
             distance = 1 * distance + 1 * calculateDistance(lat, lng, prelat, prelng);
@@ -193,11 +192,11 @@ function foundLocation(p) {
         prelat = lat;
         prelng = lng;
         ptimepre = ptime;
-    }
+    }*/
 
 }
 
-
+/*
 function makegpx() {
     var oFormObject = document.forms['togpx'];
     oFormObject.elements["gpxdata"].value = '<?xml version="1.0" encoding="UTF-8"' +
@@ -212,7 +211,7 @@ function makegpx() {
     '<trk><trkseg>' + GPX.join('') + '</trkseg></trk></gpx>';
     oFormObject.elements["gpxfilename"].value = gpxname;
     oFormObject.submit();
-}
+}*/
 
 
 function noLocation(p) {
@@ -234,6 +233,7 @@ function noLocation(p) {
 // http://www.movable-type.co.uk/scripts/latlong.html
 // Under Creative Commons License http://creativecommons.org/licenses/by/3.0/
 
+/*
 function calculateDistance(lat1, lon1, lat2, lon2) {
     var R = 6371; // km
     var dLat = (lat2 - lat1).toRad();
@@ -262,7 +262,7 @@ function ISODateString(d) {
 
 function addzero(n) {
     return (n < 10) ? ("0" + n) : n;
-}
+}*/
 
 function resend() {
     $("#buffer").html(buffer.length);
@@ -270,28 +270,42 @@ function resend() {
 
         //var posData = buffer.shift();
 
-        var tmp = buffer;
+        var tmp = buffer.slice();
         buffer.length = 0;
 
         // send to server
         $.ajax({
+            method: "post",
             url: server + '/save.php',
             data: {
-                multiple: tmp
+                multiple: tmp,
+                length: tmp.length
             },
             success: function (res) {
                 if (res != "OK") {
-                    buffer.concat(tmp);
+                    //$("#console").append("Buffer: " + buffer.length + "<br>");
+                    //$("#console").append("Retrying: " + tmp.length + "<br>");
+                    $.each(tmp, function (point) {
+                        buffer.push(tmp[point]);
+                    });
+                    //$("#console").append("Buffer: " + buffer.length + "<br>");
+                } else {
+                    //$("#console").append("Uploaded " + tmp.lenght + " points.<br>");
                 }
             },
             error: function (xhr, status, error) {
-                buffer.concat(tmp);
+                //$("#console").append("2Buffer: " + buffer.length + "<br>");
+                //$("#console").append("2Retrying: " + tmp.length + "<br>");
+                $.each(tmp, function (point) {
+                    buffer.push(tmp[point]);
+                });
+                //$("#console").append("2Buffer: " + buffer.length + "<br>");
             }
         });
     }
 
     if (started != 0) {
-        setTimeout(resend, 10000);
+        setTimeout(resend, 5000);
     }
 }
 
