@@ -4,7 +4,7 @@
   <Languages xmlns="">
     <Language code="en-US" />
   </Languages>
-  <App Author="Heikki Virekunnas" BitsPerPixel="32" Description="Mobile logger for live gps" Genre="apps.normal" ProductID="{76a5b620-6cff-11e5-a2a5-0981374c44c4}" Publisher="Heikki Virekunnas" PublisherID="{db093ed5-53b1-45f7-af72-751e8f36ab80}" RuntimeType="Silverlight" Title="KeparDI GPS" Version="1.0.2" xmlns="">
+  <App Author="Heikki Virekunnas" BitsPerPixel="32" Description="Mobile logger for live gps" Genre="apps.normal" ProductID="{76a5b620-6cff-11e5-a2a5-0981374c44c4}" Publisher="Heikki Virekunnas" PublisherID="{db093ed5-53b1-45f7-af72-751e8f36ab80}" RuntimeType="Silverlight" Title="KeparDI GPS" Version="1.1.0.0" xmlns="">
     <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_WEBBROWSERCOMPONENT" />

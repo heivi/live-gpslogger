@@ -189,6 +189,7 @@
     <None Include="cordova\run.bat" />
     <None Include="cordova\version.bat" />
     <Content Include="VERSION" />
+    <None Include="Live_GpsLogger_2015_11_01_17_50_06.sap" />
     <None Include="Properties\AppManifest.xml">
       <SubType>Designer</SubType>
     </None>
