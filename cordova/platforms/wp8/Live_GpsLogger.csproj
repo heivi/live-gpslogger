@@ -9,8 +9,8 @@
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>tk.heikin.gps.logger</RootNamespace>
-    <AssemblyName>tk.heikin.gps.logger</AssemblyName>
+    <RootNamespace>fi.virekunnas.kepardigps</RootNamespace>
+    <AssemblyName>fi.virekunnas.kepardigps</AssemblyName>
     <TargetFrameworkVersion>v8.0</TargetFrameworkVersion>
     <SilverlightVersion>
     </SilverlightVersion>
@@ -21,9 +21,9 @@
     <SupportedCultures>en-US</SupportedCultures>
     <XapOutputs>true</XapOutputs>
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
-    <XapFilename>CordovaAppProj_$(Configuration)_$(Platform).xap</XapFilename>
+    <XapFilename>KeparDIGPS_Release_AnyCPU.xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
-    <SilverlightAppEntry>tk.heikin.gps.logger.App</SilverlightAppEntry>
+    <SilverlightAppEntry>fi.virekunnas.kepardigps.App</SilverlightAppEntry>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
