@@ -34,7 +34,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Resources;
 
 
-namespace tk.heikin.gps.logger
+namespace fi.virekunnas.kepardigps
 {
     public partial class MainPage : PhoneApplicationPage
     {
