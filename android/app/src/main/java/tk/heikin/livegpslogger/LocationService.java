@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.OutputStreamWriter;
@@ -24,6 +25,8 @@ public class LocationService extends Service {
     public static final String LocationServiceName = "tk.heikin.livegpslogger.LocationService";
 
     private String trackingId = "none";
+
+    private String server = "http://gps.virekunnas.fi/";
 
     private String TAG = "LocationService";
 
@@ -80,10 +83,11 @@ public class LocationService extends Service {
         Log.d(TAG, "Wake lock acquired");
 
         trackingId = intent.getStringExtra("trackingId");
+        server = intent.getStringExtra("server");
         Log.d(TAG, intent.getExtras().toString());
 
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new MyLocationListener(trackingId, this.getApplicationContext());
+        locationListener = new MyLocationListener(trackingId, server, this.getApplicationContext());
 
         // This method is used to get updated location.
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0,

@@ -1,0 +1,9 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="pref_server"
+        android:title="@string/pref_server"
+        android:defaultValue="@string/default_server" />
+
+
+</PreferenceScreen>

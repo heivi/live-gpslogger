@@ -1,6 +1,16 @@
 <resources>
-    <string name="app_name">Live GpsLogger</string>
+    <string name="app_name">KeparDI GPS</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="pref_server">Server</string>
+    <string name="default_server">http://gps.virekunnas.fi/</string>
+
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+
 </resources>

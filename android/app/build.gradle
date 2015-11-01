@@ -7,8 +7,8 @@ android {
         applicationId "tk.heikin.livegpslogger"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 4
+        versionName '1.1.0'
     }
     buildTypes {
         release {
@@ -23,4 +23,5 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:support-v4:22.2.0'
 }
