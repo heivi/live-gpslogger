@@ -36,7 +36,7 @@ var app = {
     $(function() {
       //console.log(cordova);
       cordova.plugins.backgroundMode.setDefaults({
-        title: "Live GpsLogger taustalla",
+        title: "KeparDI GPS running",
       });
       run();
     });
@@ -63,7 +63,7 @@ var timestamp=0;
 
 var watchid=0;
 var tunnus = "none";
-var name = "none";
+var server = "http://gps.virekunnas.fi";
 
 app.initialize();
 
@@ -72,19 +72,26 @@ function startlogger() {
   if (!playing) {
     playing = 1;
     $("#startlogger").html("Stop logging");
-    cordova.plugins.backgroundMode.enable();
+    //cordova.plugins.backgroundMode.enable();
   } else {
     playing = 0;
     $("#startlogger").html("Start logging");
-    cordova.plugins.backgroundMode.disable();
+    //cordova.plugins.backgroundMode.disable();
   }
 }
 
 function startgps() {
   //alert("startgps()");
-  $("#location").html("Trying...");
-  if (!started) {
-    started = 1;
+  //$("#location").html("Trying...");
+  if (tunnus == "none" || tunnus == "") {
+      alert("Choose tracking id first!");
+      return false;
+  }
+
+  if (!started && tunnus != "none" && tunnus != "") {
+     started = 1;
+     $("#location").html("Trying...");
+    //cordova.plugins.backgroundMode.enable();
     if(navigator.geolocation) {
 
       watchid = navigator.geolocation.watchPosition(
@@ -97,36 +104,35 @@ function startgps() {
       } else {
         $("#location").html("Not supported!");
       }
-    } else {
+    } else if (!started) {
       alert("Already started!");
     }
+    return true;
   }
 
   function foundLocation(p) {
     //alert(p);
-    var d = new Date();
-    var thisDate = d.getTime();
-    thisDate=Math.floor(thisDate/1000);
 
     lat = p.coords.latitude;
     lng = p.coords.longitude;
     accuracy =p.coords.accuracy;
-    ptime=thisDate;
     timestamp = p.timestamp;
-    //  ptime=Math.floor(new Date(timestamp).getTime()/1000);
-    //if(ptime < 123878630)ptime=Math.floor(new Date(timestamp).getTime())
 
-    //alert("Sending to server");
+    timestamp = parseInt(timestamp / 1000);
+
+    if (timestamp < 1445407893) {
+        timestamp = parseInt(new Date().getTime() / 1000);
+    }
 
     // send to server
     $.ajax({
-      url: 'http://gps.heikin.tk/logger/save.php',
+      url: server+'/save.php',
       data: {
         lat: lat,
         lon: lng,
         acc: accuracy,
         c: tunnus,
-        time: parseInt(timestamp/1000)
+        time: parseInt(timestamp)
       },
       success: function(data) {
         $("#console").append("Called: "+data.toString()+"\n");
@@ -136,12 +142,15 @@ function startgps() {
       }
     });
 
-    $("#location").html("<nobr>Lat:"+(Math.floor(lat*10000000)/10000000)+
+    /*$("#location").html("<nobr>Lat:"+(Math.floor(lat*10000000)/10000000)+
     "<br>Lon:"+(Math.floor(lng*10000000)/10000000) +"<br>UTC Time:" +
     ISODateString(d) + "<br>Accuracy:"+Math.floor(accuracy)+
     "<br>Points saved: "+track.length+"<br>Time: "+
     addzero(Math.floor(tme/60))+":"+addzero(tme-Math.floor(tme/60)*60)+
-    "<br>Distance:"+(Math.floor(distance*100)/100) +" km</nobr>");
+    "<br>Distance:"+(Math.floor(distance*100)/100) +" km</nobr>");*/
+
+    $("#location").html("Tracking on!<br>Accuracy: " + accuracy + " m");
+
     if(playing && accuracy < 40 && accuracy > 0.01 && ptime -resolution > ptimepre-1) {
       if(ptimepre>0) {
         tme=tme+ptime-ptimepre;
@@ -185,7 +194,8 @@ function startgps() {
 
 
   function noLocation(p) {
-    $("#info").append("Error: "+p.message+"<br>");
+      //$("#info").append("Error: "+p.message+"<br>");
+      $("#location").html("Error finding gps: " + p.message+"<br>Retrying...");
     //alert('Error: ' +p.message);
     navigator.geolocation.clearWatch(watchid);
     watchid = navigator.geolocation.watchPosition(
@@ -240,20 +250,32 @@ function startgps() {
         tunnus = $(this).val();
       });
 
-      $("#name").change(function() {
-        name = $(this).val();
+      $("#server").change(function() {
+        server = $(this).val();
       });
 
-      $("#startgps").click(function() {
-        startgps();
+      $("#startgps").click(function () {
+          if (startgps()) {
+              $(this).attr("disabled", true);
+              $("#stopgps").attr("disabled", false);
+          }
       });
 
-      $("#startlogger").click(function() {
-        startlogger();
+      $("#stopgps").click(function () {
+        $(this).attr("disabled", true);
+        navigator.geolocation.clearWatch(watchid);
+        started = 0;
+        playing = 0;
+        $("#location").html("Press Start tracking -button to start tracking. You can save route to GPX with Save route -button.");
+        $("#startgps").attr("disabled", false);
       });
 
-      $("#getgpx").click(function() {
-        makegpx();
-      });
+      //$("#startlogger").click(function() {
+      //  startlogger();
+      //});
+
+      //$("#getgpx").click(function() {
+      //  makegpx();
+      //});
 
     }
