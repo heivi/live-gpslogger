@@ -2,7 +2,6 @@
 .gradle/
 build/
 Bin/
-cordova/
 cordovalib/
 obj/
 .vs/
