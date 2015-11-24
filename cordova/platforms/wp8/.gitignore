@@ -1,4 +1,8 @@
-cordova/
 PerfLogs/
 SubmissionInfo/
 *.sap
+Bin/
+cordova/
+cordovalib/
+obj/
+.vs/

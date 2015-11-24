@@ -1,14 +1,17 @@
 package tk.heikin.livegpslogger;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 
 /**
  * Created by heikki on 8.9.2015.
@@ -19,14 +22,37 @@ public class MyLocationListener implements LocationListener {
 
     private String trackingId = "none";
 
+    private String server = "http://gps.virekunnas.fi/";
+
     private Context context = null;
+
+    private LocalBroadcastManager broadcaster = null;
+
+    private int pointsFound = 0;
 
     private Location last = null;
 
-    public MyLocationListener(String trackingIdin, Context contextin) {
+    public MyLocationListener(String trackingIdin, String serverIn, Context contextin) {
         trackingId = trackingIdin;
         context = contextin;
+        server = serverIn;
         Log.d(TAG, "Tracking ID: "+trackingId);
+        broadcaster = LocalBroadcastManager.getInstance(context.getApplicationContext());
+        sendStatus("Waiting for GPS...", false);
+    }
+
+    public boolean sendStatus(String message, boolean increment) {
+        Intent intent = new Intent("location.status");
+        if(message != null) {
+            intent.putExtra("status", message);
+        }
+        if (increment) {
+            intent.putExtra("points", ++pointsFound);
+        } else {
+            intent.putExtra("points", pointsFound);
+        }
+        Log.d(TAG, "Status: " + message);
+        return broadcaster.sendBroadcast(intent);
     }
 
     public void onLocationChanged(final Location location) {
@@ -57,28 +83,37 @@ public class MyLocationListener implements LocationListener {
 
                     Log.v(TAG, "Query: "+query);
 
-                    URL url = new URL("http://gps.heikin.tk/logger/save.php?"+query);
-                    HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                    //connection.setRequestProperty("Cookie", cookie);
-                    Log.d(TAG, connection.toString());
-                    //Set to POST
-                    connection.setDoOutput(true);
-                    connection.setRequestMethod("POST");
-                    connection.setReadTimeout(10000);
+                    try {
+                        //URL url = new URL("http://gps.heikin.tk/logger/save.php?"+query);
+                        URL url = new URL(server + "save.php?" + query);
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        //connection.setRequestProperty("Cookie", cookie);
+                        Log.d(TAG, connection.toString());
+                        //Set to POST
+                        connection.setDoOutput(true);
+                        connection.setRequestMethod("POST");
+                        connection.setReadTimeout(10000);
                     /*Writer writer = new OutputStreamWriter(connection.getOutputStream());
                     writer.write(query);
                     writer.flush();
                     writer.close();*/
 
-                    //Log.d(TAG, connection.getResponseMessage());
+                        //Log.d(TAG, connection.getResponseMessage());
 
-                    if (connection.getResponseMessage().equals("OK")) {
-                        Log.d(TAG, "Sent POST");
-                    } else {
-                        Log.e(TAG, "Error sending!");
+                        if (connection.getResponseMessage().equals("OK")) {
+                            Log.d(TAG, "Sent POST");
+                            //Log.d(TAG, "Broadcast: " + sendStatus("OK: " + location.getTime()));
+                            sendStatus("OK", true);
+                        } else {
+                            Log.e(TAG, "Error sending!");
+                            //Log.d(TAG, "Broadcast: " + sendStatus("Error: " + location.getTime()));
+                            sendStatus("Error sending!", true);
+                        }
+
+                        connection.disconnect();
+                    } catch (UnknownHostException e) {
+                        sendStatus("Internet error!", false);
                     }
-
-                    connection.disconnect();
 
                     //Log.d(TAG, "Sent POST");
 

@@ -1,9 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'">
-  <title>Live GpsLogger</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' * 'unsafe-inline' 'unsafe-eval'">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+  <title>KeparDI GPS</title>
   <link href="css/index.css" rel="stylesheet" />
   <!--<script type="text/javascript" src="cordova.js"></script>-->
   <script src="js/jquery-2.1.4.min.js" type="text/javascript"></script>
@@ -12,40 +13,53 @@
 </head>
 <body>
 
+
+
   <div class="half">
-    <h1 class="title">Live GpsLogger</h1>
+    <h1 class="title"><img src="img/WideLogo.png" alt="KeparDI GPS"/></h1>
 
     <div id="console" style="width:90%; display: none"></div>
 
-    <div id="location">Press Start GPS button to start tracking. You can save route to GPX with start logging -button.</div>
+    <div id="location">Press Start tracking -button to start tracking.</div>
+      <br />
     <div id="settings">
       <table border="0">
         <tbody>
           <tr>
-            <td><input type="text" name="id" id="id" maxlength="4"/></td>
-            <td>Seurantatunnus</td>
+            <td>Your tracking id for example t01</td>
           </tr>
           <tr>
-            <td><input type="text" name="name" id="name" /></td>
-            <td>Nimi</td>
+            <td><input type="text" name="id" id="id" placeholder="tracking id" /></td>
+          </tr>
+          <tr>
+            <td>Tracking server</td>
+          </tr>
+          <tr>
+            <td><input type="text" name="server" id="server" value="http://gps.virekunnas.fi" /></td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
-  <div class="half">
-    <button id="startgps" class="cbutton">Start GPS</button><br><br>
-    <button id="startlogger" class="cbutton">Start Logging</button>
-    <br><br>
-    <button id="getgpx" class="cbutton">Download log as GPX</button>
-    <div id="info"></div>
-  </div>
 
-  <form name="togpx" action="http://gps.heikin.tk/logger/downloadgpx.php" method="POST">
+    <div class="buttons">
+        <button id="startgps" class="cbutton">Start tracking</button><br /><br />
+        <button id="stopgps" class="cbutton" disabled>Stop tracking</button><br /><br />
+        <!--<button id="startlogger" class="cbutton">Save to GPX</button>
+        <br><br>
+        <button id="getgpx" class="cbutton">Download route as GPX</button>-->
+        <div id="info"></div>
+    </div>
+
+  <!--<form name="togpx" action="http://gps.virekunnas.fi/downloadgpx.php" method="POST">
     <input name="gpxdata" id="gpxdata" value="" type="hidden">
     <input name="gpxfilename" id="gpxfilename" value="" type="hidden">
-  </form>
+  </form>-->
 
+    <div class="version">
+        Version 1.1.0, 2015-11-01. In buffer: <span id="buffer">0</span> points.<br />
+        <span id="console"></span>
+    </div>
 
 
 </body>
