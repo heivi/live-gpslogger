@@ -19,6 +19,12 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.net.UnknownHostException;
+
 public class MainActivity extends AppCompatActivity {
 
     private LocationService locationService;
@@ -26,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = "MainActivity";
     private BroadcastReceiver receiver = null;
     private boolean registered = false;
+    private String serverS = "";
+    private String trackingidS = "";
 
     TextView status = null;
 
@@ -59,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
             serverTextTmp = serverTextTmp+"/";
         }
         final String serverText = serverTextTmp;
+        serverS = serverTextTmp;
 
         server.setText("Server: "+serverText);
 
@@ -74,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 EditText trackingID = (EditText) findViewById(R.id.trackingID);
                 //TextView textView = (TextView) findViewById(R.id.textView);
                 serviceIntent.putExtra("trackingId", trackingID.getText().toString());
+                trackingidS = trackingID.getText().toString();
                 serviceIntent.putExtra("server", serverText);
                 startService(serviceIntent);
                 TextView textView2 = (TextView) findViewById(R.id.textView2);
@@ -132,6 +142,51 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // send to server
+                try {
+                    //URL url = new URL("http://gps.heikin.tk/logger/save.php?"+query);
+                    URL url = new URL(serverS + "save.php?c=" + trackingidS +
+                            "&time="+System.currentTimeMillis()/1000L+"&screen=on");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    //connection.setRequestProperty("Cookie", cookie);
+                    Log.d(TAG, connection.toString());
+                    //Set to POST
+                    connection.setDoOutput(true);
+                    connection.setRequestMethod("POST");
+                    connection.setReadTimeout(10000);
+                        /*Writer writer = new OutputStreamWriter(connection.getOutputStream());
+                        writer.write(query);
+                        writer.flush();
+                        writer.close();*/
+
+                    //Log.d(TAG, connection.getResponseMessage());
+
+                    if (connection.getResponseMessage().equals("OK")) {
+                        Log.d(TAG, "Sent POST");
+                        //Log.d(TAG, "Broadcast: " + sendStatus("OK: " + location.getTime()));
+                        //sendStatus("OK", true);
+                    } else {
+                        Log.e(TAG, "Error sending!");
+                        //Log.d(TAG, "Broadcast: " + sendStatus("Error: " + location.getTime()));
+                        //sendStatus("Error sending!", true);
+                    }
+
+                    connection.disconnect();
+                } catch (UnknownHostException e) {
+                    //sendStatus("Internet error!", false);
+                } catch (ProtocolException e) {
+
+                } catch (IOException e) {
+
+                }
+            }
+        }).start();
+
+
         /*final Button button = (Button) findViewById(R.id.button);
         final Button button2 = (Button) findViewById(R.id.button2);
         final TextView server = (TextView) findViewById(R.id.textView3);

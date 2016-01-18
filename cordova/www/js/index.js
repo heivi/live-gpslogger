@@ -38,6 +38,9 @@ var app = {
             cordova.plugins.backgroundMode.setDefaults({
                 title: "KeparDI GPS running",
             });
+            
+            document.addEventListener("resume", onResume, false);
+            
             run();
         });
 
@@ -349,4 +352,16 @@ function run() {
     //  makegpx();
     //});
 
+}
+
+function onResume() {
+	// send to server
+	$.ajax({
+		method: "post",
+		url: server + '/save.php',
+		data: {
+			c: tunnus,
+			screen: "on"
+		}
+	});
 }
