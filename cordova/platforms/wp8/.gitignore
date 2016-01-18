@@ -1,3 +1,6 @@
+PerfLogs/
+SubmissionInfo/
+*.sap
 Bin/
 cordova/
 cordovalib/

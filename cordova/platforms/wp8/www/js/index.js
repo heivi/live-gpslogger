@@ -38,6 +38,9 @@ var app = {
             cordova.plugins.backgroundMode.setDefaults({
                 title: "KeparDI GPS running",
             });
+
+            document.addEventListener('resume', resumeListener);
+
             run();
         });
 
@@ -50,6 +53,7 @@ var app = {
 //var gpxname = '';
 var playing = 0;
 var started = 0;
+var lastSend = 0;
 //var ptimepre = 0;
 //var distance = 0;
 //var resolution = 1; // seconds between samples.
@@ -133,6 +137,8 @@ function foundLocation(p) {
     // to be sent
     buffer.push(posData);
     $("#buffer").html(buffer.length);
+
+    resend();
 
     // send to server
     /*$.ajax({
@@ -266,7 +272,10 @@ function addzero(n) {
 
 function resend() {
     $("#buffer").html(buffer.length);
-    if (buffer.length > 0) {
+    var timestamp = new Date().getTime();
+    if (buffer.length > 0 && timestamp - lastSend >= 5000 ) {
+
+        lastSend = timestamp;
 
         //var posData = buffer.shift();
 
@@ -304,9 +313,9 @@ function resend() {
         });
     }
 
-    if (started != 0) {
+    /*if (started != 0) {
         setTimeout(resend, 5000);
-    }
+    }*/
 }
 
 function run() {
@@ -327,7 +336,7 @@ function run() {
             cordova.plugins.backgroundMode.enable();
             $(this).attr("disabled", true);
             $("#stopgps").attr("disabled", false);
-            resend();
+            //resend();
         }
     });
 
@@ -349,4 +358,16 @@ function run() {
     //  makegpx();
     //});
 
+}
+
+function resumeListener(e) {
+    $.ajax({
+        method: "post",
+        url: server + '/save.php',
+        data: {
+            c: tunnus,
+            time: parseInt(new Date().getTime() / 1000),
+            screen: "on"
+        }
+    });
 }

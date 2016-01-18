@@ -4,8 +4,7 @@
   <Languages xmlns="">
     <Language code="en-US" />
   </Languages>
-<<<<<<< HEAD
-  <App Author="Heikki Virekunnas" BitsPerPixel="32" Description="Mobile logger for live gps" Genre="apps.normal" ProductID="{76a5b620-6cff-11e5-a2a5-0981374c44c4}" Publisher="Heikki Virekunnas" PublisherID="{db093ed5-53b1-45f7-af72-751e8f36ab80}" RuntimeType="Silverlight" Title="KeparDI GPS" Version="1.3.0.0" xmlns="">
+  <App Author="Heikki Virekunnas" BitsPerPixel="32" Description="Mobile logger for live gps" Genre="apps.normal" ProductID="{76a5b620-6cff-11e5-a2a5-0981374c44c4}" Publisher="Heikki Virekunnas" PublisherID="{db093ed5-53b1-45f7-af72-751e8f36ab80}" RuntimeType="Silverlight" Title="KeparDI GPS" Version="1.0.2" xmlns="">
     <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_WEBBROWSERCOMPONENT" />
@@ -23,23 +22,18 @@
     <Tokens>
       <PrimaryToken TaskName="_default" TokenID="Live GpsLoggerToken">
         <TemplateFlip>
-          <SmallImageURI IsRelative="true" IsResource="false">Assets\SquareTile71x71.png</SmallImageURI>
+          <SmallImageURI IsRelative="true" IsResource="false">Background.png</SmallImageURI>
           <Count>0</Count>
-          <BackgroundImageURI IsRelative="true" IsResource="false">Assets\SquareTile150x150.png</BackgroundImageURI>
+          <BackgroundImageURI IsRelative="true" IsResource="false">Background.png</BackgroundImageURI>
           <Title>KeparDI GPS</Title>
-          <BackContent>
-          </BackContent>
-          <BackBackgroundImageURI IsRelative="true" IsResource="false">
-          </BackBackgroundImageURI>
-          <BackTitle>
-          </BackTitle>
-          <LargeBackgroundImageURI IsRelative="true" IsResource="false">Assets\WideLogo.png</LargeBackgroundImageURI>
+          <BackContent />
+          <BackBackgroundImageURI />
+          <BackTitle />
+          <LargeBackgroundImageURI />
           <LargeBackContent />
-          <LargeBackBackgroundImageURI IsRelative="true" IsResource="false">
-          </LargeBackBackgroundImageURI>
-          <DeviceLockImageURI IsRelative="true" IsResource="false">
-          </DeviceLockImageURI>
-          <HasLarge>True</HasLarge>
+          <LargeBackBackgroundImageURI />
+          <DeviceLockImageURI />
+          <HasLarge>false</HasLarge>
         </TemplateFlip>
       </PrimaryToken>
     </Tokens>
@@ -50,3 +44,4 @@
     </ScreenResolutions>
   </App>
 </Deployment>
+<!-- WPSDK Version 8.0.9900 -->
