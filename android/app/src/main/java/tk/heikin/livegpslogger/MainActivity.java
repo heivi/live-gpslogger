@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         final TextView server = (TextView) findViewById(R.id.textView3);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String serverTextTmp = sharedPreferences.getString("pref_server", "http://gps.virekunnas" +
+        String serverTextTmp = sharedPreferences.getString("pref_server", "https://gps.virekunnas" +
                 ".fi/");
         if (!serverTextTmp.endsWith("/")) {
             serverTextTmp = serverTextTmp+"/";
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
         final TextView server = (TextView) findViewById(R.id.textView3);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String serverTextTmp = sharedPreferences.getString("pref_server", "http://gps.virekunnas" +
+        String serverTextTmp = sharedPreferences.getString("pref_server", "https://gps.virekunnas" +
                 ".fi/");
         if (!serverTextTmp.endsWith("/")) {
             serverTextTmp = serverTextTmp+"/";

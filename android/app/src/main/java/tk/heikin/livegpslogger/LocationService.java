@@ -26,7 +26,7 @@ public class LocationService extends Service {
 
     private String trackingId = "none";
 
-    private String server = "http://gps.virekunnas.fi/";
+    private String server = "https://gps.virekunnas.fi/";
 
     private String TAG = "LocationService";
 
