@@ -64,7 +64,7 @@ var buffer = new Array();
 
 var watchid = 0;
 var tunnus = "none";
-var server = "http://gps.virekunnas.fi";
+var server = "https://gps.virekunnas.fi";
 
 app.initialize();
 
