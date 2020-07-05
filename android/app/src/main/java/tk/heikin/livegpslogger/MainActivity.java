@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +26,9 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private String trackingidS = "";
 
     TextView status = null;
+    TextView buffered = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,21 +53,36 @@ public class MainActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 String s = intent.getStringExtra("status");
                 int points = intent.getIntExtra("points", 0);
+                int bufferedPoints = intent.getIntExtra("bufferedPoints", 0);
                 // do something here.
 
-                status.setText(s+", points found: "+points);
+                buffered.setText(bufferedPoints+ " points buffered");
+                status.setText(s+", points sent: "+points);
                 Log.d(TAG, "Status: " + s);
             }
         };
 
         status = (TextView) findViewById(R.id.textView4);
+        buffered = (TextView) findViewById(R.id.bufferText);
 
         final Button button = (Button) findViewById(R.id.button);
         final Button button2 = (Button) findViewById(R.id.button2);
         final TextView server = (TextView) findViewById(R.id.textView3);
 
+        PackageInfo pInfo = null;
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String version = pInfo.versionName;
+            TextView versionTV = (TextView) findViewById(R.id.versionText);
+            Date buildDate = BuildConfig.buildTime;
+            DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+            versionTV.setText("Version " + version + " (Built " + df.format(buildDate) + ")");
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String serverTextTmp = sharedPreferences.getString("pref_server", "https://gps.virekunnas" +
+        String serverTextTmp = sharedPreferences.getString("pref_server", "http://gps.virekunnas" +
                 ".fi/");
         if (!serverTextTmp.endsWith("/")) {
             serverTextTmp = serverTextTmp+"/";
@@ -187,7 +208,8 @@ public class MainActivity extends AppCompatActivity {
         }).start();
 
 
-        /*final Button button = (Button) findViewById(R.id.button);
+        /*
+        final Button button = (Button) findViewById(R.id.button);
         final Button button2 = (Button) findViewById(R.id.button2);
         final TextView server = (TextView) findViewById(R.id.textView3);
 
@@ -232,7 +254,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 status.setText("Not running");
             }
-        });*/
+        });
+        */
     }
 
     @Override
