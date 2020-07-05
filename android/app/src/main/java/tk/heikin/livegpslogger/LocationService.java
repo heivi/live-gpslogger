@@ -3,10 +3,13 @@ package tk.heikin.livegpslogger;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -16,6 +19,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.OutputStreamWriter;
@@ -29,7 +33,7 @@ public class LocationService extends Service {
 
     private String trackingId = "none";
 
-    private String server = "http://gps.virekunnas.fi/";
+    private String server = "https://gps.virekunnas.fi/";
 
     private String TAG = "LocationService";
 
@@ -73,9 +77,25 @@ public class LocationService extends Service {
                 noti = new Notification.Builder(this.getApplicationContext())
                         .setContentTitle("Location tracking on background")
                         .getNotification();
-            } else {
+            } else if (sdk < Build.VERSION_CODES.O) {
                 noti = new Notification.Builder(this.getApplicationContext())
                         .setContentTitle("Location tracking on background")
+                        .build();
+            } else {
+                String NOTIFICATION_CHANNEL_ID = "tk.heikin.kepardigps";
+                String channelName = "KeparDI GPS";
+                NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+                chan.setLightColor(Color.BLUE);
+                chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                assert manager != null;
+                manager.createNotificationChannel(chan);
+
+                Notification.Builder notificationBuilder = new Notification.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
+                noti = notificationBuilder
+                        .setOngoing(true)
+                        .setContentTitle("KeparDI GPS is running in background")
+                        .setCategory(Notification.CATEGORY_SERVICE)
                         .build();
             }
 
@@ -85,7 +105,7 @@ public class LocationService extends Service {
         pm = (PowerManager) this.getApplicationContext().getSystemService(Context.POWER_SERVICE);
 
         wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Location tracking");
-        wl.acquire();
+        wl.acquire(240*60*1000L /*240 minutes*/);
 
         Log.d(TAG, "Wake lock acquired");
 

@@ -1,5 +1,6 @@
 package tk.heikin.livegpslogger;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -39,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     private boolean registered = false;
     private String serverS = "";
     private String trackingidS = "";
+    private static final String[] LOCATION_PERMS={
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
+
 
     TextView status = null;
     TextView buffered = null;
@@ -82,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String serverTextTmp = sharedPreferences.getString("pref_server", "http://gps.virekunnas" +
+        String serverTextTmp = sharedPreferences.getString("pref_server", "https://gps.virekunnas" +
                 ".fi/");
         if (!serverTextTmp.endsWith("/")) {
             serverTextTmp = serverTextTmp+"/";
@@ -91,6 +98,17 @@ public class MainActivity extends AppCompatActivity {
         serverS = serverTextTmp;
 
         server.setText("Server: "+serverText);
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED) {
+        } else {
+            ActivityCompat.requestPermissions(this, new String[] {
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION },
+                    1231);
+        }
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -128,6 +146,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private boolean hasPermission(String perm) {
+        return(PackageManager.PERMISSION_GRANTED==checkSelfPermission(perm));
+    }
+
+    private boolean canAccessLocation() {
+        return(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
     }
 
     @Override

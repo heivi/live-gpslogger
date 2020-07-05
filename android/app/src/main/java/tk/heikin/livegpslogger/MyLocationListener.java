@@ -11,8 +11,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -129,10 +131,14 @@ public class MyLocationListener implements LocationListener {
                             } else {
                                 Log.e(TAG, "Error sending!");
                                 //Log.d(TAG, "Broadcast: " + sendStatus("Error: " + location.getTime()));
-                                sendStatus("Error sending!", false, false);
+                                sendStatus("Error sending! (" + connection.getResponseMessage() + ")", false, false);
                             }
 
                             connection.disconnect();
+
+                            if (buffer.size() > 0) {
+                                sendBuffer();
+                            }
                         }
                     } catch (UnknownHostException e) {
                         buffer.add(url);
@@ -148,6 +154,74 @@ public class MyLocationListener implements LocationListener {
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     Log.e(TAG, e.toString());
+                }
+            }
+        }).start();
+    }
+
+    public static void sendBuffer() {
+        new Thread( new Runnable() {
+            @Override
+            public void run() {
+                if (MyLocationListener.buffer.size() == 0) {
+                    return;
+                }
+                // copy urls to local buffer
+                List<URL> localbuffer = new ArrayList<URL>(MyLocationListener.buffer.size());
+                for (URL url : MyLocationListener.buffer) {
+                    localbuffer.add(url);
+                }
+                MyLocationListener.buffer.clear();
+                for (int i = 0; i < localbuffer.size(); i++) {
+                    Log.d(TAG, "Sending from buffer "+i);
+                    HttpURLConnection connection = null;
+                    try {
+                        connection = (HttpURLConnection) localbuffer.get(i).openConnection();
+                    } catch (IOException e) {
+                        //MyLocationListener.pointsBuffered--;
+                        e.printStackTrace();
+                        i = i-1;
+                        continue;
+                    }
+                    //connection.setRequestProperty("Cookie", cookie);
+                    Log.d(TAG, connection.toString());
+                    //Set to POST
+                    connection.setDoOutput(true);
+                    try {
+                        connection.setRequestMethod("POST");
+                    } catch (ProtocolException e) {
+                        //MyLocationListener.pointsBuffered--;
+                        e.printStackTrace();
+                        i = i-1;
+                        continue;
+                    }
+                    connection.setReadTimeout(10000);
+
+                    //Log.d(TAG, connection.getResponseMessage());
+
+                    try {
+                        if (connection.getResponseMessage().equals("OK")) {
+                            Log.d(TAG, "Sent POST");
+                            //Log.d(TAG, "Broadcast: " + sendStatus("OK: " + location.getTime()));
+                            MyLocationListener.pointsBuffered--;
+                            MyLocationListener.sendStatus("OK", true, false);
+                        } else {
+                            Log.e(TAG, "Error sending!");
+                            //Log.d(TAG, "Broadcast: " + sendStatus("Error: " + location.getTime()));
+                            //MyLocationListener.pointsBuffered--;
+                            MyLocationListener.sendStatus("Error sending!", false, false);
+                            i = i-1;
+                            continue;
+                        }
+                    } catch (IOException e) {
+                        //MyLocationListener.pointsBuffered--;
+                        e.printStackTrace();
+                        i = i-1;
+                        continue;
+                    }
+
+                    connection.disconnect();
+
                 }
             }
         }).start();

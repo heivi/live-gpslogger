@@ -42,63 +42,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
             Log.d(TAG, "Network available!");
 
-            new Thread( new Runnable() {
-                @Override
-                public void run() {
-                    if (MyLocationListener.buffer.size() == 0) {
-                        return;
-                    }
-                    // copy urls to local buffer
-                    List<URL> localbuffer = new ArrayList<URL>(MyLocationListener.buffer.size());
-                    for (URL url : MyLocationListener.buffer) {
-                        localbuffer.add(url);
-                    }
-                    MyLocationListener.buffer.clear();
-                    for (int i = 0; i < localbuffer.size(); i++) {
-                        Log.d(TAG, "Sending from buffer "+i);
-                        HttpURLConnection connection = null;
-                        try {
-                            connection = (HttpURLConnection) localbuffer.get(i).openConnection();
-                        } catch (IOException e) {
-                            MyLocationListener.pointsBuffered--;
-                            e.printStackTrace();
-                        }
-                        //connection.setRequestProperty("Cookie", cookie);
-                        Log.d(TAG, connection.toString());
-                        //Set to POST
-                        connection.setDoOutput(true);
-                        try {
-                            connection.setRequestMethod("POST");
-                        } catch (ProtocolException e) {
-                            MyLocationListener.pointsBuffered--;
-                            e.printStackTrace();
-                        }
-                        connection.setReadTimeout(10000);
-
-                        //Log.d(TAG, connection.getResponseMessage());
-
-                        try {
-                            if (connection.getResponseMessage().equals("OK")) {
-                                Log.d(TAG, "Sent POST");
-                                //Log.d(TAG, "Broadcast: " + sendStatus("OK: " + location.getTime()));
-                                MyLocationListener.pointsBuffered--;
-                                MyLocationListener.sendStatus("OK", true, false);
-                            } else {
-                                Log.e(TAG, "Error sending!");
-                                //Log.d(TAG, "Broadcast: " + sendStatus("Error: " + location.getTime()));
-                                MyLocationListener.pointsBuffered--;
-                                MyLocationListener.sendStatus("Error sending!", false, false);
-                            }
-                        } catch (IOException e) {
-                            MyLocationListener.pointsBuffered--;
-                            e.printStackTrace();
-                        }
-
-                        connection.disconnect();
-
-                    }
-                }
-            }).start();
+            MyLocationListener.sendBuffer();
 
         }
     }
